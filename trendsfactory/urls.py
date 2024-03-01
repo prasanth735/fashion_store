@@ -26,7 +26,9 @@ urlpatterns = [
     path("",views.SigninView.as_view(),name="signin"),
     path("index",views.IndexView.as_view(),name="index"),
     path("product/<int:pk>/",views.ProductdetailView.as_view(),name="product-detail"),
-    path("home",views.HomeView.as_view(),name="home")
+    path("home",views.HomeView.as_view(),name="home"),
+    path("product/<int:pk>/add_to_basket",views.AddToBasketView.as_view(),name="addto-basket"),
+    path("basket/all",views.BasketItemListView.as_view(),name="basket-items")
     
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
