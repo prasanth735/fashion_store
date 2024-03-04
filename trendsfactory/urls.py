@@ -28,7 +28,8 @@ urlpatterns = [
     path("product/<int:pk>/",views.ProductdetailView.as_view(),name="product-detail"),
     path("home",views.HomeView.as_view(),name="home"),
     path("product/<int:pk>/add_to_basket",views.AddToBasketView.as_view(),name="addto-basket"),
-    path("basket/all",views.BasketItemListView.as_view(),name="basket-items")
+    path("basket/all",views.BasketItemListView.as_view(),name="basket-items"),
+    path("basket/<int:pk>/remove/",views.BasketItemRemoveView.as_view(),name="basket-remove"),
     
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

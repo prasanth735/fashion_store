@@ -6,6 +6,17 @@ from store.models import Product,BasketItem,Size
 from django.contrib import messages
 
 
+
+def signin_required(fn):
+    def wrapper(request,*args,**kwargs):
+        if not request.user.is_authenticated:
+            return redirect ("signin")
+        else:
+            return fn(request,*args,**kwargs)
+    return wrapper
+
+
+
 # Create your views here.
 
 # url :localhost:8000/registration/
@@ -101,5 +112,13 @@ class BasketItemListView(View):
         qs=request.user.cart.cartitem.filter(is_order_placed=False)
     
         return render(request,"cartitem_list.html",{"data":qs})
+    
 
 
+
+class BasketItemRemoveView(View):
+    def get(self,request,*args,**kwargs):
+        id=kwargs.get("pk")
+        basket_item_object=BasketItem.objects.get(id=id)
+        basket_item_object.delete()
+        return redirect("basket-items")
