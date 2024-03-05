@@ -122,3 +122,38 @@ class BasketItemRemoveView(View):
         basket_item_object=BasketItem.objects.get(id=id)
         basket_item_object.delete()
         return redirect("basket-items")
+    
+
+
+
+
+class CartItemUpadteqtyView(View):
+    def post(self,request,*args,**kwargs):
+        action=request.POST.get("counterbutton")
+        id=kwargs.get("pk")
+        basket_item_object=BasketItem.objects.get(id=id)
+        if action=="+":
+            basket_item_object.qty+=1
+            basket_item_object.save()
+        else:
+            basket_item_object.qty-=1
+            basket_item_object.save()
+        # print(action)
+        return redirect("basket-items")
+        
+
+
+
+
+class  CheckoutView(View):
+
+    def get(self,request,*args,**kwargs):
+        return render(request,"checkout.html")
+    
+    def post(self,request,*args,**kwargs):
+        email=request.POST.get("email")
+        phone=request.POST.get("phone")
+        address=request.POST.get("address")
+        print(email,phone,address)
+        return redirect("index")
+
