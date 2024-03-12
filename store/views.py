@@ -1,3 +1,10 @@
+import razorpay
+
+KEY_ID=""
+KEY_SECRET=""
+
+
+
 from django.shortcuts import render,redirect
 from django.views.generic import View,TemplateView,DeleteView
 from django.contrib.auth import authenticate,login,logout
@@ -8,6 +15,8 @@ from django.views.decorators.cache import never_cache
 from store.decorators import signin_required,owner_permission_required
 from store.forms import RegistrationForm,LoginForm
 from store.models import Product,BasketItem,Size,Order,OrderItems
+
+
 
 
 
@@ -147,13 +156,16 @@ class  CheckoutView(View):
         email=request.POST.get("email")
         phone=request.POST.get("phone")
         address=request.POST.get("address")
+        payment_method=request.POST.get("payment")
+
 
         order_obj=Order.objects.create(
             user_object=request.user,
             delivery_address=address,
             phone=phone,
             email=email,
-            total=request.user.cart.basket_total
+            total=request.user.cart.basket_total,
+            payment=payment_method
         )
         try:
             basket_items=request.user.cart.cart_items
@@ -172,7 +184,16 @@ class  CheckoutView(View):
 
 
         finally:
+            if payment_method=="online" and order_obj:
+                client = razorpay.Client(auth=(KEY_ID, KEY_SECRET))
+
+                data = { "amount": order_obj.get_order_total*100, "currency": "INR", "receipt": "order_rcptid_11" }
+                payment = client.order.create(data=data)
+
+                print(payment)
+
             return redirect("index")
+            
 
 
 @method_decorator([signin_required,never_cache],name="dispatch")           
@@ -184,12 +205,9 @@ class SignoutView(View):
     
 
 
-
-
-
 class Order_summaryView(View):
     def get(self,request,*args,**kwargs):
-        qs=Order.objects.filter(user_object=request.user)
+        qs=Order.objects.filter(user_object=request.user).exclude(status="cancelled")
         return render (request,"summary.html",{"data":qs})
     
 
@@ -200,3 +218,4 @@ class OrderItemRemoveView(View):
         id=kwargs.get("pk")
         OrderItems.objects.get(id=id).delete()
         return redirect("order-summary")
+    
